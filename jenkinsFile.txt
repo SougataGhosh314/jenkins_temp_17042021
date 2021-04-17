@@ -1,0 +1,63 @@
+pipeline {
+    agent any
+
+    stages {
+        
+        stage('clone'){
+            steps{
+		// cloning from git repo
+                git 'https://github.com/SougataGhosh314/spring-boot-rest-learning.git'
+            }
+        }
+
+	// running maven clean and compile
+        
+        stage('build'){
+            steps{
+                parallel (
+                    "Taskone" : {
+                        bat 'mvn clean'
+                        //do some stuff
+                    },
+                    "Tasktwo" : {
+                        // Do some other stuff in parallel
+                        bat 'mvn compile'
+                    }
+                )
+            }
+            
+            
+        }
+
+	// running maven test
+        
+        stage('test & QA'){
+            steps{
+                bat 'mvn test'
+            }
+        }
+
+	// creating jar and running maven install (in embedded tomcat server)
+        
+        stage('deploy'){
+            steps{
+                script{
+                    try {
+                        bat 'mvn install'
+                    }catch (exc) {
+                        echo 'Something didn\'t work and got some exceptions'
+                    }
+                }
+            }
+            
+            post {
+                // post actions: record the test results and archive the jar file.
+                success {
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'target/*.jar'
+                }
+            }
+        }
+        
+    }
+}

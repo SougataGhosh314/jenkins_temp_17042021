@@ -1,0 +1,7 @@
+* Jenkins running in a Docker container
+
+* Spring Boot project (uses maven as build tool and embedded tomcat server) being pulled from github
+
+* pipeline script is declarative
+
+* some logs, jenkinsFile and screenshots attached
